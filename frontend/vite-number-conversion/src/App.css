@@ -1,0 +1,76 @@
+* {
+  font-weight: bold;
+  font-family: 'Verdana';
+}
+
+.form-clients {
+  display: flex;
+  height: 48px;
+}
+
+.table-form { 
+  background: linear-gradient(-45deg,#2f3e46,#354f52,#84a98c,#52796f);
+    background-size: 400% 400%;
+    -webkit-animation: gradient 15s ease infinite;
+    animation: gradient 15s ease infinite;
+}
+
+.table-div {
+  width: 80%;
+  margin-left: 250px;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+  background-color: #ececec;
+  animation: 15s ease infinite;
+}
+
+.dogpage button {
+  width: 500px;
+  background-color: green;
+}
+
+.dogpage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 686px;
+  width: 500px;
+}
+
+.cat-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-basis: 1;
+  align-items: center;
+}
+
+.home-bar {
+  display: flex;
+  width: 200px;
+  height: 300px;
+  background-color: #ececec;
+}
+
+
+a:-webkit-any-link {
+  color: #ececec;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+a:-webkit-any-link:hover {
+  color: green;
+}
+
+.box-login {
+  display: flex;
+  background-color: #FFFDC2;
+  justify-content: center;
+  align-items: center;
+  width: 1920px;
+  height: 948px;
+}
