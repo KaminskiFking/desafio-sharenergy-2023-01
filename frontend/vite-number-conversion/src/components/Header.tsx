@@ -39,7 +39,7 @@ function Header() {
   }
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem('token');
     window.location.reload();
   }
 

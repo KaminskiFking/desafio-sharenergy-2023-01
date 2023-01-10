@@ -180,8 +180,8 @@ const ClientPage = () => {
         <TableBody aria-label="customized table" >
           {customers && customers.map((item: any) => (
             <TableRow key={item.email}>
-              <TableCell style={ { color: 'black', fontWeight: 'lighter', fontFamily: 'Times New Roman',} }align="left">{item.email}</TableCell>
               <TableCell style={ { color: 'black', fontWeight: 'lighter', fontFamily: 'Times New Roman',} }align="left">{item.name}</TableCell>
+              <TableCell style={ { color: 'black', fontWeight: 'lighter', fontFamily: 'Times New Roman',} }align="left">{item.email}</TableCell>
               <TableCell style={ { color: 'black', fontWeight: 'lighter', fontFamily: 'Times New Roman',} }align="left">{item.cpf}</TableCell>
               <TableCell style={ { color: 'black', fontWeight: 'lighter', fontFamily: 'Times New Roman',} }align="left">{item.telephone}</TableCell>
               <TableCell style={ { color: 'black', fontWeight: 'lighter', fontFamily: 'Times New Roman',} }align="left">{item.address}</TableCell>
