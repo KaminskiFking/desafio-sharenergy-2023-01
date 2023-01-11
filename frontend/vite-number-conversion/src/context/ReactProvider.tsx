@@ -19,7 +19,7 @@ function ReactProvider({ children }: any) {
     loadingStorageData();
   }, [])
 
-  const SignIn = async ({username, password }) => {
+  const SignIn = async ({ username, password }: { username: string; password: any }) => {
     const response = await api.post("/login", {
       username,
       password
@@ -31,7 +31,7 @@ function ReactProvider({ children }: any) {
     ] = `Bearer ${token}`
     localStorage.setItem("token", token);
   }
-
+  
   const contextValue = {
     user,
     signed: !!user,

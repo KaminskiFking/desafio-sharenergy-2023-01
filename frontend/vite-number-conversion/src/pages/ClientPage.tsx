@@ -1,5 +1,5 @@
-import ClientPageHooks from '../hooks/ClientPageHooks';
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { message } from 'antd';
 import '@fontsource/roboto/500.css';
 import Header from '../components/Header';
 import { InputAdornment, 
@@ -16,54 +16,102 @@ import AddIcCallIcon from '@mui/icons-material/AddIcCall';
 import HomeIcon from '@mui/icons-material/Home';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { ReactContext } from '../context/ReactContext';
+import { api } from '../services/api';
 
 const ClientPage = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [telephone, setTelephone] = useState('');
+  const [address, setAddress] = useState('');
+  const [cpf, setCpf] = useState('');
   const [edit, setEdit] = useState(false);
-  const [id, setId]: any = useState('');
-  const { customers, addCustomer, updateCustomer, deleteCustomer } = ClientPageHooks();
+  const [clients, setClients] = useState([]);
+  const { user } = useContext(ReactContext);
+  const [_id, setId]: any = useState('');
   const [open, setOpen] = useState(false);
 
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  async function handleSubmit() {
+    try {
+      await api.put(`clients/${_id}`, {name,
+        email,
+        telephone,
+        address,
+        cpf}, {
+          headers: {
+            Authorization: user,
+          },
+        });
+      setOpen(false);
+      message.success('Cliente atualizado com sucesso!');
 
-  const handleAddCustomer = (event: any) => {
-    event.preventDefault();
-    const { name, email, cpf, telephone, address } = event.target.elements;
-    addCustomer({
-      id: Date.now(),
-      name: name.value,
-      email: email.value,
-      cpf: cpf.value,
-      telephone: telephone.value,
-      address: address.value
-    });
+    } catch (error) {
+      message.error('Erro ao atualizar cliente, tente novamente.');
+    }
   }
 
-  const handleUpdateForm = (event: any) => {
-    event.preventDefault();
-    const { name, email, cpf, telephone, address } = event.target.elements;
-    const updateCustomerForm = ({
-      id: Date.now(),
-      name: name.value,
-      email: email.value,
-      cpf: cpf.value,
-      telephone: telephone.value,
-      address: address.value
-    });
-    updateCustomer(id, updateCustomerForm)
-    setEdit(false);
+
+  async function deleteClient(id: any) {
+    try {
+      await api.delete(`clients/${id}`, {
+        headers: {
+          Authorization: user,
+        },
+      })
+      message.success('Cliente deletado com sucesso');
+
+    } catch (error) {
+      message.error('Erro ao deletar cliente, tente novamente.');
+    }
   }
 
-  const handleEditUpdate = (id: number) => {
+  async function registerClient(e: any) {
+    e.preventDefault();
+    try {
+      await api.post('clients', {
+        name,
+        email,
+        telephone,
+        address,
+        cpf
+      }, {
+        headers: {
+          Authorization: user,
+        }
+      });
+
+      message.success('Cliente Cadastrado');
+
+    } catch (error) {
+      message.error('Erro ao cadastrar usuário, verifique os campos e tente novamente');
+    }
+  }
+
+  async function getAllClients() {
+    const clientsAll = await api.get('clients', 
+      {
+        headers: {
+          Authorization: user,
+        },
+      },
+  );
+    const { data } = clientsAll;
+    setClients(data.message);
+  }
+
+  useEffect(() => {
+    getAllClients();
+  }, [clients]);
+
+  useEffect(() => {
+    getAllClients();
+  }, [registerClient]);
+
+  const handleEditUpdate = (id: string) => {
     setOpen(!open);
     setEdit(true);
     setId(id)
-  }
-
-  const handleDeleteCustomer = (id: number) => {
-    deleteCustomer(id);
   }
 
   const theme = createTheme({
@@ -83,12 +131,14 @@ const ClientPage = () => {
       </div>
       <br/><br/><br/><br/><br/>
       <div style={{display: 'flex', flexDirection: 'column', width: 1080, justifyContent: 'center', marginLeft: 408}}>
-      <form onSubmit={handleAddCustomer} className="form-clients">
+      <form className="form-clients">
       <TextField
         type='text'
         name='name'
         id="input-with-icon-textfield"
         label="Name"
+        value={name}
+        onChange={(e: any) => setName(e.target.value)}
         required
         InputProps={{
           startAdornment: (
@@ -104,6 +154,8 @@ const ClientPage = () => {
         name='email'
         id="input-with-icon-textfield"
         label="Email"
+        value={email}
+        onChange={(e: any) => setEmail(e.target.value)}
         required
         InputProps={{
           startAdornment: (
@@ -119,6 +171,8 @@ const ClientPage = () => {
         name='cpf'
         id="input-with-icon-textfield"
         label="CPF"
+        value={cpf}
+        onChange={(e: any) => setCpf(e.target.value)}
         required
         InputProps={{
           startAdornment: (
@@ -134,6 +188,8 @@ const ClientPage = () => {
         name='telephone'
         id="input-with-icon-textfield"
         label="Telephone"
+        value={telephone}
+        onChange={(e: any) => setTelephone(e.target.value)}
         required
         InputProps={{
           startAdornment: (
@@ -149,6 +205,8 @@ const ClientPage = () => {
         name='address'
         id="input-with-icon-textfield"
         label="Address"
+        value={address}
+        onChange={(e: any) => setAddress(e.target.value)}
         required
         InputProps={{
           startAdornment: (
@@ -160,7 +218,7 @@ const ClientPage = () => {
         variant="standard"
       />
        <ThemeProvider theme={ theme }>
-        <Button variant="contained" color="primary" type="submit">Add Customer</Button>
+        <Button variant="contained" onClick={registerClient} color="primary" type="button">Add Customer</Button>
         </ThemeProvider>
       </form>
       <div>
@@ -178,15 +236,15 @@ const ClientPage = () => {
           </TableRow>
         </TableHead>
         <TableBody aria-label="customized table" >
-          {customers && customers.map((item: any) => (
+          {clients && clients.map((item: any) => (
             <TableRow key={item.email}>
               <TableCell style={ { color: 'black', fontWeight: 'lighter', fontFamily: 'Times New Roman',} }align="left">{item.name}</TableCell>
               <TableCell style={ { color: 'black', fontWeight: 'lighter', fontFamily: 'Times New Roman',} }align="left">{item.email}</TableCell>
               <TableCell style={ { color: 'black', fontWeight: 'lighter', fontFamily: 'Times New Roman',} }align="left">{item.cpf}</TableCell>
               <TableCell style={ { color: 'black', fontWeight: 'lighter', fontFamily: 'Times New Roman',} }align="left">{item.telephone}</TableCell>
               <TableCell style={ { color: 'black', fontWeight: 'lighter', fontFamily: 'Times New Roman',} }align="left">{item.address}</TableCell>
-              <TableCell> <Button onClick={() => handleEditUpdate(item.id)}><CreateIcon color="success" /></Button> </TableCell>
-              <TableCell> <Button onClick={() => handleDeleteCustomer(item.id)}><DeleteForeverIcon  color="error"/></Button> </TableCell>
+              <TableCell> <Button onClick={() => handleEditUpdate(item._id)}><CreateIcon color="success" /></Button> </TableCell>
+              <TableCell> <Button onClick={() => deleteClient(item._id)}><DeleteForeverIcon  color="error"/></Button> </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -200,12 +258,15 @@ const ClientPage = () => {
         open={open}
       >
         <TableContainer style={{display: 'flex', flexDirection: 'column', width: 400}} component={Paper}>
-        <form style={{display: 'flex', flexDirection: 'column', width: 400}} onSubmit={handleUpdateForm}>
+        <form style={{display: 'flex', flexDirection: 'column', width: 400}}>
         <TextField
         type='text'
         name='name'
         id="input-with-icon-textfield"
         label="Name"
+        value={name}
+        onChange={(e: any) => setName(e.target.value)}
+        required
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -220,6 +281,9 @@ const ClientPage = () => {
         name='email'
         id="input-with-icon-textfield"
         label="Email"
+        value={email}
+        onChange={(e: any) => setEmail(e.target.value)}
+        required
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -234,6 +298,9 @@ const ClientPage = () => {
         name='cpf'
         id="input-with-icon-textfield"
         label="CPF"
+        value={cpf}
+        onChange={(e: any) => setCpf(e.target.value)}
+        required
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -248,6 +315,9 @@ const ClientPage = () => {
         name='telephone'
         id="input-with-icon-textfield"
         label="Telephone"
+        value={telephone}
+        onChange={(e: any) => setTelephone(e.target.value)}
+        required
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -262,6 +332,9 @@ const ClientPage = () => {
         name='address'
         id="input-with-icon-textfield"
         label="Address"
+        value={address}
+        onChange={(e: any) => setAddress(e.target.value)}
+        required
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -270,8 +343,9 @@ const ClientPage = () => {
           ),
         }}
         variant="standard"
-      /><ThemeProvider theme={ theme }>
-        <Button variant="contained" color="primary" onClick={handleClose} type="submit">Edit Customer</Button>
+      />
+      <ThemeProvider theme={ theme }>
+        <Button variant="contained" color="primary" onClick={handleSubmit} type="button">Edit Customer</Button>
         </ThemeProvider>
         </form>
         </TableContainer>
