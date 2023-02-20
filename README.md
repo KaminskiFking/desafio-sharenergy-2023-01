@@ -33,6 +33,7 @@ $ docker exec -it shareenergy bash
 $ npm install 
 # Rode o back end
 $ npm start
+O usuário deve ser capaz de se autenticar utilizando o username desafiosharenergy e password sh@r3n3rgy
 ```
 
 ## 🧑‍💻 Contatos
